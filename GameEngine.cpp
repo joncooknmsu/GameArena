@@ -53,9 +53,9 @@ bool GameEngine::overlap(Position low1, Position high1, Position low2,
 {
     bool overlapInX = false;
     bool overlapInY = false;
-    if (low2.x <= high1.x+PLAYER_SIZE && high2.x+PLAYER_SIZE >= low1.x)
+    if (low2.x <= high1.x + PLAYER_SIZE && high2.x + PLAYER_SIZE >= low1.x)
         overlapInX = true;
-    if (low2.y <= high1.y+PLAYER_SIZE && high2.y+PLAYER_SIZE >= low1.y)
+    if (low2.y <= high1.y + PLAYER_SIZE && high2.y + PLAYER_SIZE >= low1.y)
         overlapInY = true;
     if (overlapInX && overlapInY)
         return true;
@@ -80,13 +80,21 @@ void GameEngine::newGame()
         do {
             again = false;
             obstacles[i]->low.x =
-                  (random() % (lowerRight.x - upperLeft.x - (MAX_OBSTACLE_WIDTH+MIN_OBSTACLE_WIDTH+PLAYER_SIZE))) +
+                  (random() %
+                   (lowerRight.x - upperLeft.x -
+                    (MAX_OBSTACLE_WIDTH + MIN_OBSTACLE_WIDTH + PLAYER_SIZE))) +
                   upperLeft.x + MIN_OBSTACLE_WIDTH;
             obstacles[i]->low.y =
-                  (random() % (lowerRight.y - upperLeft.y - (MAX_OBSTACLE_HEIGHT+MIN_OBSTACLE_HEIGHT+PLAYER_SIZE))) +
+                  (random() % (lowerRight.y - upperLeft.y -
+                               (MAX_OBSTACLE_HEIGHT + MIN_OBSTACLE_HEIGHT +
+                                PLAYER_SIZE))) +
                   upperLeft.y + MIN_OBSTACLE_HEIGHT;
-            obstacles[i]->high.x = obstacles[i]->low.x + (random() % MAX_OBSTACLE_WIDTH + MIN_OBSTACLE_WIDTH);
-            obstacles[i]->high.y = obstacles[i]->low.y + (random() % MAX_OBSTACLE_HEIGHT + MIN_OBSTACLE_HEIGHT);
+            obstacles[i]->high.x =
+                  obstacles[i]->low.x +
+                  (random() % MAX_OBSTACLE_WIDTH + MIN_OBSTACLE_WIDTH);
+            obstacles[i]->high.y =
+                  obstacles[i]->low.y +
+                  (random() % MAX_OBSTACLE_HEIGHT + MIN_OBSTACLE_HEIGHT);
             for (j = 0; j < i; j++) {
                 if (overlap(obstacles[j]->low, obstacles[j]->high,
                             obstacles[i]->low, obstacles[i]->high)) {
@@ -110,14 +118,16 @@ void GameEngine::newGame()
         do {
             Position pl, ph;
             again = false;
-            prizes[i]->pos.x = (random() % (lowerRight.x - upperLeft.x - PRIZE_SIZE)) +
-                               upperLeft.x + PRIZE_SIZE;
-            prizes[i]->pos.y = (random() % (lowerRight.y - upperLeft.y - PRIZE_SIZE)) +
-                               upperLeft.y + PRIZE_SIZE;
-            pl.x = prizes[i]->pos.x - PRIZE_SIZE/2;
-            pl.y = prizes[i]->pos.y - PRIZE_SIZE/2;
-            ph.x = prizes[i]->pos.x + PRIZE_SIZE/2;
-            ph.y = prizes[i]->pos.y + PRIZE_SIZE/2;
+            prizes[i]->pos.x =
+                  (random() % (lowerRight.x - upperLeft.x - PRIZE_SIZE)) +
+                  upperLeft.x + PRIZE_SIZE;
+            prizes[i]->pos.y =
+                  (random() % (lowerRight.y - upperLeft.y - PRIZE_SIZE)) +
+                  upperLeft.y + PRIZE_SIZE;
+            pl.x = prizes[i]->pos.x - PRIZE_SIZE / 2;
+            pl.y = prizes[i]->pos.y - PRIZE_SIZE / 2;
+            ph.x = prizes[i]->pos.x + PRIZE_SIZE / 2;
+            ph.y = prizes[i]->pos.y + PRIZE_SIZE / 2;
             for (j = 0; j < NUM_OBSTACLES && obstacles[j]; j++) {
                 if (overlap(obstacles[j]->low, obstacles[j]->high, pl, ph)) {
                     std::cout
@@ -175,17 +185,16 @@ void GameEngine::setPlayer(int playerNum, int id, std::string name)
         start.y = lowerRight.y - PLAYER_SIZE;
         goal.y = upperLeft.y + PLAYER_SIZE;
     }
-    players[playerNum] = playerFactory->createPlayer(name);
+    players[playerNum] = playerFactory->createPlayer(name, playerNum, start, goal);
     if (!players[playerNum]) {
         std::cerr << "GE Error: player (" << name << ") not found!\n";
         return;
     }
-    players[playerNum]->setStart(start);
-    players[playerNum]->setGoal(goal);
     playerStats[playerNum].score = 0;
     playerStats[playerNum].goal = goal;
     playerStats[playerNum].atGoal = false;
     playerStats[playerNum].prev = start;
+    playerStats[playerNum].info.id = playerNum;
     playerStats[playerNum].info.pos = start;
     playerStats[playerNum].info.lastDir = PlayerInfo::N;
     numPlayers++;
@@ -222,7 +231,8 @@ void GameEngine::draw()
             fl_color(FL_RED);
         else
             fl_color(FL_GREEN);
-        fl_rectf(prizes[i]->pos.x - PRIZE_SIZE/2, prizes[i]->pos.y - PRIZE_SIZE/2, PRIZE_SIZE, PRIZE_SIZE);
+        fl_rectf(prizes[i]->pos.x - PRIZE_SIZE / 2,
+                 prizes[i]->pos.y - PRIZE_SIZE / 2, PRIZE_SIZE, PRIZE_SIZE);
     }
     // Draw the obstacles
     fl_color(FL_YELLOW);
@@ -239,7 +249,8 @@ void GameEngine::draw()
 }
 
 // absolute value: Use in prize acquisition checking
-#define ABSDIFF(x,y) (((x) >= (y)) ? (((int)x)-((int)(y))) : (((int)y)-((int)(x))))
+#define ABSDIFF(x, y)                                                          \
+    (((x) >= (y)) ? (((int)x) - ((int)(y))) : (((int)y) - ((int)(x))))
 
 //
 // Update the game state to a new state
@@ -272,16 +283,19 @@ void GameEngine::update()
         oldPos = players[p]->currentPosition();
         players[p]->update(area, cPrizes, cObstacles, cPlayers);
         newPos = players[p]->currentPosition();
-        if (ABSDIFF(oldPos.x,newPos.x) > (MAX_MOVE) || ABSDIFF(oldPos.y,newPos.y) > (MAX_MOVE)) {
+        if (ABSDIFF(oldPos.x, newPos.x) > (MAX_MOVE) ||
+            ABSDIFF(oldPos.y, newPos.y) > (MAX_MOVE)) {
             std::cerr << "Player " << p
-                      << " tries to move to far! Penalty of -1!" 
-                      << "(" << oldPos << ")" << "(" << newPos << ")\n";
+                      << " tries to move to far! Penalty of -1!"
+                      << "(" << oldPos << ")"
+                      << "(" << newPos << ")\n";
             playerStats[p].score--;
         }
         // now check to see if player landed on any prizes (+/- 1 pixel)
         for (i = 0; i < NUM_PRIZES; i++) {
-            if (!prizes[i]->claimed && ABSDIFF(prizes[i]->pos.x,newPos.x) <= 1 &&
-                ABSDIFF(prizes[i]->pos.y,newPos.y) <= 1) {
+            if (!prizes[i]->claimed &&
+                ABSDIFF(prizes[i]->pos.x, newPos.x) <= 1 &&
+                ABSDIFF(prizes[i]->pos.y, newPos.y) <= 1) {
                 prizes[i]->claimed = true;
                 players[p]->prizeClaimed(*prizes[i]);
                 std::cerr << "Player " << p << " claimed a prize!\n";
@@ -293,15 +307,17 @@ void GameEngine::update()
             Position olow = obstacles[i]->low;
             Position ohigh = obstacles[i]->high;
             // technically PLAYER_SIZE/2 should be the border, but let's be generous
-            if (newPos.x > olow.x - PLAYER_SIZE/4 && newPos.x < ohigh.x + PLAYER_SIZE/4 &&
-                newPos.y > olow.y - PLAYER_SIZE/4 && newPos.y < ohigh.y + PLAYER_SIZE/4) {
+            if (newPos.x > olow.x - PLAYER_SIZE / 4 &&
+                newPos.x < ohigh.x + PLAYER_SIZE / 4 &&
+                newPos.y > olow.y - PLAYER_SIZE / 4 &&
+                newPos.y < ohigh.y + PLAYER_SIZE / 4) {
                 std::cerr << "Player " << p << " hit an obstacle!\n";
                 playerStats[p].score -= OBSTACLE_HIT_PENALTY;
             }
         }
         // Check to see if player reached their goal (+/- 1 pixel)
-        if (ABSDIFF(playerStats[p].goal.x,newPos.x) <= 1 &&
-            ABSDIFF(playerStats[p].goal.y,newPos.y) <= 1) {
+        if (ABSDIFF(playerStats[p].goal.x, newPos.x) <= 1 &&
+            ABSDIFF(playerStats[p].goal.y, newPos.y) <= 1) {
             std::cerr << "Player " << p << " reached their goal!\n";
             playerStats[p].atGoal = true;
             if (numGoalsReached == 0)
@@ -314,6 +330,45 @@ void GameEngine::update()
                 playerStats[p].score += FOURTH_FINISH_VALUE;
             numGoalsReached++;
         }
+        // count cost of attack mode
+        if (players[p]->inAttackMode()) {
+            playerStats[p].score -= 1;
+        }
+    }
+    // Check players for intersecting with each other and
+    // see if attack mode is on; if it is, award points
+    for (unsigned int i1 = 0; i1 < MAX_PLAYERS; i1++) {
+        if (!players[i1])
+            continue;
+        for (unsigned int i2 = i1+1; i2 < MAX_PLAYERS; i2++) {
+            if (!players[i2])
+               continue;
+            Player& p1 = *players[i1];
+            Player& p2 = *players[i2];
+            Position pos1 = p1.currentPosition();
+            Position pos2 = p2.currentPosition();
+            if (ABSDIFF(pos1.x,pos2.x) < 3 && ABSDIFF(pos1.y,pos2.y) < 3) {
+                //std::cerr << "Players overlap!\n";
+                if (p1.inAttackMode() && !p2.inAttackMode()) {
+                    std::cerr << p1.name() <<  " attacks " << p2.name() << "!\n";
+                    playerStats[i2].score -= ATTACK_VALUE;
+                    playerStats[i1].score += ATTACK_VALUE;
+                }
+                else if (!p1.inAttackMode() && p2.inAttackMode()) {
+                    std::cerr << p2.name() <<  " attacks " << p1.name() << "!\n";
+                    playerStats[i2].score += ATTACK_VALUE;
+                    playerStats[i1].score -= ATTACK_VALUE;
+                } else {
+                    std::cerr << p1.name() <<  " overlaps " << p2.name() << "!\n";
+                }
+            }
+        }
+    }
+    // Update player positions in the info record
+    for (unsigned int i = 0; i < MAX_PLAYERS; i++) {
+        if (!players[i])
+            continue;
+        playerStats[i].info.pos = players[i]->currentPosition();
     }
     // now that we have updated the game state, tell FLTK
     // to redraw the window (FLTK will eventually call our

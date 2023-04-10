@@ -31,7 +31,7 @@
 class PlayerFactory
 {
  public:
-    Player* createPlayer(std::string playerName);
+    Player* createPlayer(std::string playerName, unsigned int id, Position start, Position goal);
     std::vector<std::string> allPlayerNames();
 };
 

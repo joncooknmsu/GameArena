@@ -22,7 +22,7 @@ MainWindow::MainWindow()
     // begin window sub-components
     begin();
     // create menu bar
-    menuBar = new MenuBar();
+    menuBar = new MenuBar(*this);
     // create drawing area object
     game = new GameEngine(0, 70, w(), h() - 70);
     // declare the drawing area to be resizable
@@ -197,7 +197,7 @@ void NewGameButton::pushed()
 
 //------------- MenuBar -------------------//
 
-MenuBar::MenuBar() : Fl_Menu_Bar(0, 0, 500, 30), app(app)
+MenuBar::MenuBar(MainWindow& app) : Fl_Menu_Bar(0, 0, 500, 30), app(app)
 {
     // Add File->Quit menu item and connect it to the dispatcher
     add("&File/&Quit", "^q", MainWindow::dispatcher,

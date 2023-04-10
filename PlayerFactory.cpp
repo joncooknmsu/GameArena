@@ -21,17 +21,17 @@
 //   must be use in the string, and the correct class in the
 //   "return new ..." statement.
 //
-Player* PlayerFactory::createPlayer(std::string playerName)
+Player* PlayerFactory::createPlayer(std::string playerName, unsigned int id, Position start, Position goal)
 {
     if (!playerName.compare("Jon-slow")) {
         //std::cout << "creating player Jon-slow\n";
-        return new PlayerJonslow();
+        return new PlayerJonslow(id, start, goal);
     } else if (!playerName.compare("Jon-fast")) {
         //std::cout << "creating player Jon-fast\n";
-        return new PlayerJonfast();
+        return new PlayerJonfast(id, start, goal);
     } else if (!playerName.compare("Jon-smart")) {
         //std::cout << "creating player Jon-fast\n";
-        return new PlayerJonsmart();
+        return new PlayerJonsmart(id, start, goal);
     }
     return NULL;
 }

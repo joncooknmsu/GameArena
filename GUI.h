@@ -23,7 +23,7 @@ class MainWindow; // forward declaration
 class MenuBar : public Fl_Menu_Bar
 {
  public:
-    MenuBar();
+    MenuBar(MainWindow& app);
     void exitGame();
  private:
     MainWindow& app;
