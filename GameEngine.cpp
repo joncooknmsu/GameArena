@@ -1,10 +1,8 @@
 //
-//
-// MSG GameEngine class: this class is responsible for controlling
-// the entire game
+// The main game controller implementation
 //
 // Author: Jonathan Cook
-// Copyright (C) 2023 Jonathan Cook. All rights reserved
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
 
 #include "GameEngine.h"
@@ -185,7 +183,8 @@ void GameEngine::setPlayer(int playerNum, int id, std::string name)
         start.y = lowerRight.y - PLAYER_SIZE;
         goal.y = upperLeft.y + PLAYER_SIZE;
     }
-    players[playerNum] = playerFactory->createPlayer(name, playerNum, start, goal);
+    players[playerNum] =
+          playerFactory->createPlayer(name, playerNum, start, goal);
     if (!players[playerNum]) {
         std::cerr << "GE Error: player (" << name << ") not found!\n";
         return;
@@ -340,26 +339,26 @@ void GameEngine::update()
     for (unsigned int i1 = 0; i1 < MAX_PLAYERS; i1++) {
         if (!players[i1])
             continue;
-        for (unsigned int i2 = i1+1; i2 < MAX_PLAYERS; i2++) {
+        for (unsigned int i2 = i1 + 1; i2 < MAX_PLAYERS; i2++) {
             if (!players[i2])
-               continue;
+                continue;
             Player& p1 = *players[i1];
             Player& p2 = *players[i2];
             Position pos1 = p1.currentPosition();
             Position pos2 = p2.currentPosition();
-            if (ABSDIFF(pos1.x,pos2.x) < 3 && ABSDIFF(pos1.y,pos2.y) < 3) {
+            if (ABSDIFF(pos1.x, pos2.x) < 3 && ABSDIFF(pos1.y, pos2.y) < 3) {
                 //std::cerr << "Players overlap!\n";
                 if (p1.inAttackMode() && !p2.inAttackMode()) {
-                    std::cerr << p1.name() <<  " attacks " << p2.name() << "!\n";
+                    std::cerr << p1.name() << " attacks " << p2.name() << "!\n";
                     playerStats[i2].score -= ATTACK_VALUE;
                     playerStats[i1].score += ATTACK_VALUE;
-                }
-                else if (!p1.inAttackMode() && p2.inAttackMode()) {
-                    std::cerr << p2.name() <<  " attacks " << p1.name() << "!\n";
+                } else if (!p1.inAttackMode() && p2.inAttackMode()) {
+                    std::cerr << p2.name() << " attacks " << p1.name() << "!\n";
                     playerStats[i2].score += ATTACK_VALUE;
                     playerStats[i1].score -= ATTACK_VALUE;
                 } else {
-                    std::cerr << p1.name() <<  " overlaps " << p2.name() << "!\n";
+                    std::cerr << p1.name() << " overlaps " << p2.name()
+                              << "!\n";
                 }
             }
         }

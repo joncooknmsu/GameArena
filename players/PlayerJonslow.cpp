@@ -1,4 +1,9 @@
-
+//
+// Example player code -- a little slow
+//
+// Author: Jonathan Cook
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
+//
 #include "PlayerJonslow.h"
 #include <iostream>
 

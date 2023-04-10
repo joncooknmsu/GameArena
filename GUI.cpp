@@ -1,11 +1,10 @@
 //
-//
-// MSG Main: My Stupid Game, a robot player game
+// GUI Classes Implementation
 // This file contains the window construction code and the callback
 // functions that connect to user widgets (and the timer callback)
 //
 // Author: Jonathan Cook
-// Copyright (C) 2013 Jonathan Cook. All rights reserved
+// Copyright (C) 2013 Jonathan Cook. All rights reserved.
 //
 
 #include "GUI.h"
@@ -40,7 +39,8 @@ MainWindow::MainWindow()
         while (namesI != playerNames.end()) {
             //std::cout << "main:Player: " << *namesI << endl;
             playerSelector[pi]->add((*namesI).c_str(), 0,
-                                    PlayerSelector::select, (void*)((long)i), 0);
+                                    PlayerSelector::select, (void*)((long)i),
+                                    0);
             namesI++;
             i++;
         }
@@ -89,7 +89,7 @@ void MainWindow::dispatcher(Fl_Widget* w, void* selection)
 void timerExpired(void* wp)
 {
     // cast the void pointer back into a real MainWindow pointer
-    MainWindow* app = (MainWindow*) wp;
+    MainWindow* app = (MainWindow*)wp;
     app->timerExpired();
 }
 

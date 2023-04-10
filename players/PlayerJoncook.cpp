@@ -1,4 +1,9 @@
-
+//
+// Example player code -- a default player
+//
+// Author: Jonathan Cook
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
+//
 #include "PlayerJoncook.h"
 #include <iostream>
 

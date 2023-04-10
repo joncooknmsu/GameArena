@@ -1,18 +1,17 @@
 //
-//
-// MSG: PlayerFactory class; this class is a factory for
+// PlayerFactory class; this class is a factory for
 // all of the different actual implementations of the Player robots
 // - it instantiates each type of player by name (string), and also
 //   provides a vector of strings of all the player names so that the
 //   GUI can provide a selection list to the user
 //
 // Author: Jonathan Cook
-// Copyright (C) 2013 Jonathan Cook. All rights reserved
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
 
-#include <iostream>
 #include "PlayerFactory.h"
 #include "PlayerDefs.h"
+#include <iostream>
 
 //
 // Create player objects by name
@@ -21,7 +20,8 @@
 //   must be use in the string, and the correct class in the
 //   "return new ..." statement.
 //
-Player* PlayerFactory::createPlayer(std::string playerName, unsigned int id, Position start, Position goal)
+Player* PlayerFactory::createPlayer(std::string playerName, unsigned int id,
+                                    Position start, Position goal)
 {
     if (!playerName.compare("Jon-slow")) {
         //std::cout << "creating player Jon-slow\n";

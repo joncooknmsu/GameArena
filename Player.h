@@ -1,11 +1,11 @@
 //
-// MSG: Player interface, with helper classes; each robot
+// Player interface, with helper classes; each robot
 // player class must inherit from and then implement the
 // methods in the abstract Player class. The helper classes
 // are simple data structures to make the interfaces cleaner.
 //
 // Author: Jonathan Cook
-// Copyright (C) 2023 Jonathan Cook. All rights reserved
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
 
 #ifndef Player_H

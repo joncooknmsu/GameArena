@@ -1,5 +1,5 @@
 #
-# FLTK-usable makefile
+# Game Arena Makefile
 #
 
 CC = gcc

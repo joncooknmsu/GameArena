@@ -1,9 +1,8 @@
 //
-// MSG GameEngine header: this class is responsible for controlling
-// the entire game
+// Game Engine: this is the main game controller class
 //
 // Author: Jonathan Cook
-// Copyright (C) 2023 Jonathan Cook. All rights reserved
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
 
 #ifndef GAME_ENGINE_H
@@ -16,12 +15,12 @@
 // window needs redrawn after the game state is updated (using Fl::redraw())
 //
 
+#include "GameParams.h"
 #include "PlayerFactory.h"
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 #include <string>
 #include <vector>
-#include "GameParams.h"
 
 // helper class that holds info about a player: its
 // current score, goal, and whether it reached the goal

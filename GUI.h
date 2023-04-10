@@ -1,13 +1,13 @@
 //
-// MSG GUI classes header: a few GUI classes, the main window
+// GUI classes header: a few GUI classes, the main window
 // class should probably move to its own files
 //
 // Author: Jonathan Cook
-// Copyright (C) 2023 Jonathan Cook. All rights reserved
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
 
-#include <string>
-#include <vector>
+#include "GameEngine.h"
+#include "GameParams.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -15,8 +15,8 @@
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Window.H>
 #include <FL/fl_draw.H>
-#include "GameParams.h"
-#include "GameEngine.h"
+#include <string>
+#include <vector>
 
 class MainWindow; // forward declaration
 

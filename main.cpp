@@ -1,3 +1,9 @@
+//
+// Game main
+//
+// Author: Jonathan Cook
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
+//
 #include "GUI.h"
 
 //
@@ -12,7 +18,8 @@ int main(int argc, char* argv[])
     }
     // create a GUI window object
     MainWindow* app = new MainWindow();
-    if (!app) { /*suppress warning*/ }
+    if (!app) { /*suppress warning*/
+    }
     // standard way to run an FLTK GUI app
     return (Fl::run());
 }

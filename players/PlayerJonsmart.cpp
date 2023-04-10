@@ -1,4 +1,9 @@
-
+//
+// Example player code -- a little bit of smarts
+//
+// Author: Jonathan Cook
+// Copyright (C) 2023 Jonathan Cook. All rights reserved.
+//
 #include "PlayerJonsmart.h"
 #include <iostream>
 
