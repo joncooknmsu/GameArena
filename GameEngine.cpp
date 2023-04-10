@@ -239,7 +239,7 @@ void GameEngine::draw()
 }
 
 // absolute value: Use in prize acquisition checking
-#define ABS(x) (((x) >= 0) ? (x) : -(x))
+#define ABSDIFF(x,y) (((x) >= (y)) ? (((int)x)-((int)(y))) : (((int)y)-((int)(x))))
 
 //
 // Update the game state to a new state
@@ -272,15 +272,16 @@ void GameEngine::update()
         oldPos = players[p]->currentPosition();
         players[p]->update(area, cPrizes, cObstacles, cPlayers);
         newPos = players[p]->currentPosition();
-        if (ABS(oldPos.x - newPos.x) > (MAX_MOVE) || ABS(oldPos.y - newPos.y) > (MAX_MOVE)) {
+        if (ABSDIFF(oldPos.x,newPos.x) > (MAX_MOVE) || ABSDIFF(oldPos.y,newPos.y) > (MAX_MOVE)) {
             std::cerr << "Player " << p
-                      << " tries to move to far! Penalty of -1!\n";
+                      << " tries to move to far! Penalty of -1!" 
+                      << "(" << oldPos << ")" << "(" << newPos << ")\n";
             playerStats[p].score--;
         }
         // now check to see if player landed on any prizes (+/- 1 pixel)
         for (i = 0; i < NUM_PRIZES; i++) {
-            if (!prizes[i]->claimed && ABS(prizes[i]->pos.x - newPos.x) <= 1 &&
-                ABS(prizes[i]->pos.y - newPos.y) <= 1) {
+            if (!prizes[i]->claimed && ABSDIFF(prizes[i]->pos.x,newPos.x) <= 1 &&
+                ABSDIFF(prizes[i]->pos.y,newPos.y) <= 1) {
                 prizes[i]->claimed = true;
                 players[p]->prizeClaimed(*prizes[i]);
                 std::cerr << "Player " << p << " claimed a prize!\n";
@@ -291,15 +292,16 @@ void GameEngine::update()
         for (i = 0; i < NUM_OBSTACLES; i++) {
             Position olow = obstacles[i]->low;
             Position ohigh = obstacles[i]->high;
-            if (newPos.x > olow.x - PLAYER_SIZE/2 && newPos.x < ohigh.x + PLAYER_SIZE/2 &&
-                newPos.y > olow.y - PLAYER_SIZE/2 && newPos.y < ohigh.y + PLAYER_SIZE/2) {
+            // technically PLAYER_SIZE/2 should be the border, but let's be generous
+            if (newPos.x > olow.x - PLAYER_SIZE/4 && newPos.x < ohigh.x + PLAYER_SIZE/4 &&
+                newPos.y > olow.y - PLAYER_SIZE/4 && newPos.y < ohigh.y + PLAYER_SIZE/4) {
                 std::cerr << "Player " << p << " hit an obstacle!\n";
                 playerStats[p].score -= OBSTACLE_HIT_PENALTY;
             }
         }
         // Check to see if player reached their goal (+/- 1 pixel)
-        if (ABS(playerStats[p].goal.x - newPos.x) <= 1 &&
-            ABS(playerStats[p].goal.y - newPos.y) <= 1) {
+        if (ABSDIFF(playerStats[p].goal.x,newPos.x) <= 1 &&
+            ABSDIFF(playerStats[p].goal.y,newPos.y) <= 1) {
             std::cerr << "Player " << p << " reached their goal!\n";
             playerStats[p].atGoal = true;
             if (numGoalsReached == 0)

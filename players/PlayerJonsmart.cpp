@@ -69,7 +69,7 @@ void PlayerJonsmart::update(const GameArea& area, const std::vector<Prize const 
       Position olow  = obstacles[i]->low;
       Position ohigh = obstacles[i]->high;
       if (pos.x > (olow.x-PLAYER_SIZE/2) && pos.x < (ohigh.x+PLAYER_SIZE/2) &&
-          pos.y > (olow.y-PLAYER_SIZE) && pos.y < (ohigh.y+PLAYER_SIZE/2)) {
+          pos.y > (olow.y-PLAYER_SIZE/2) && pos.y < (ohigh.y+PLAYER_SIZE/2)) {
          target = pos;
          //if (pos.x < (olow.x+ohigh.x)/2) 
          if (pos.y < olow.y)
