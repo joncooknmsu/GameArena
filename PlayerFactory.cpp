@@ -23,15 +23,14 @@
 Player* PlayerFactory::createPlayer(std::string playerName, unsigned int id,
                                     Position start, Position goal)
 {
-    if (!playerName.compare("Jon-slow")) {
-        //std::cout << "creating player Jon-slow\n";
-        return new PlayerJonslow(id, start, goal);
-    } else if (!playerName.compare("Jon-fast")) {
-        //std::cout << "creating player Jon-fast\n";
-        return new PlayerJonfast(id, start, goal);
-    } else if (!playerName.compare("Jon-smart")) {
-        //std::cout << "creating player Jon-fast\n";
-        return new PlayerJonsmart(id, start, goal);
+    if (!playerName.compare("JonCook")) {
+        return new JonCook(id, start, goal);
+    } else if (!playerName.compare("JonSlow")) {
+        return new JonSlow(id, start, goal);
+    } else if (!playerName.compare("JonFast")) {
+        return new JonFast(id, start, goal);
+    } else if (!playerName.compare("JonSmart")) {
+        return new JonSmart(id, start, goal);
     }
     return NULL;
 }
@@ -45,8 +44,9 @@ Player* PlayerFactory::createPlayer(std::string playerName, unsigned int id,
 std::vector<std::string> PlayerFactory::allPlayerNames()
 {
     std::vector<std::string> names;
-    names.push_back("Jon-slow");
-    names.push_back("Jon-fast");
-    names.push_back("Jon-smart");
+    names.push_back("JonCook");
+    names.push_back("JonSlow");
+    names.push_back("JonFast");
+    names.push_back("JonSmart");
     return names;
 }

@@ -10,11 +10,10 @@
 #include <FL/fl_draw.H>
 #include <Player.h>
 
-class PlayerJonsmart : public Player
+class JonSmart : public Player
 {
  public:
-    //PlayerJonsmart(const Position initial, const Position goal);
-    PlayerJonsmart(unsigned int id, Position start, Position goal);
+    JonSmart(unsigned int id, Position start, Position goal);
     virtual void draw();
     virtual void update(const GameArea& area,
                         const std::vector<Prize const*> prizes,
@@ -22,7 +21,7 @@ class PlayerJonsmart : public Player
                         const std::vector<PlayerInfo const*> players);
     virtual void prizeClaimed(const Prize& prize);
     virtual Position currentPosition() { return pos; }
-    virtual const char* name() { return "Jonsmart"; }
+    virtual const char* name() { return "JonSmart"; }
     virtual bool inAttackMode() { return false; }
  private:
     Position pos, dir;

@@ -5,6 +5,8 @@
 // Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
 #include "GUI.h"
+#include <stdlib.h>
+#include <time.h>
 
 //
 // Program main: construct window and game object,
@@ -15,6 +17,8 @@ int main(int argc, char* argv[])
     if (--argc) {
         int randseed = atoi(argv[1]);
         srandom(randseed);
+    } else {
+        srandom(time(0));
     }
     // create a GUI window object
     MainWindow* app = new MainWindow();

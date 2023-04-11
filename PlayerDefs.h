@@ -12,8 +12,9 @@
 #ifndef PLAYER_DEFS_H
 #define PLAYER_DEFS_H
 
-#include "players/PlayerJonfast.h"
-#include "players/PlayerJonslow.h"
-#include "players/PlayerJonsmart.h"
+#include "players/JonCook.h"
+#include "players/JonFast.h"
+#include "players/JonSlow.h"
+#include "players/JonSmart.h"
 
 #endif

@@ -1,69 +1,55 @@
 //
-// Example player code -- a little bit of smarts
+// Example player code -- some smarts, and fast
 //
 // Author: Jonathan Cook
 // Copyright (C) 2023 Jonathan Cook. All rights reserved.
 //
-#include "PlayerJonsmart.h"
+#include "JonFast.h"
 #include <iostream>
-
-using namespace std;
 
 //
 // Constructor
 //
-//PlayerJonsmart::PlayerJonsmart(const Position initial, const Position goal)
-PlayerJonsmart::PlayerJonsmart(unsigned int id, Position start, Position goal)
+JonFast::JonFast(unsigned int id, Position start, Position goal)
       : Player(id, start, goal)
 {
-    /*
-   pos = initial;
-   this->goal = goal;
-   if (goal.x > pos.x) 
-      dir.x = 2;
-   else
-      dir.x = -2;
-   if (goal.y > pos.y) 
-      dir.y = 2;
-   else
-      dir.y = -2;   
-*/
     dir.x = 0;
     dir.y = 0;
     pos = start;
     //color = random() & 0xffffff00;
-    color = FL_GREEN;
+    color = FL_RED;
     haveTarget = false;
     obstacleTarget = {0, 0};
+    attackMode = false;
 }
 
 //
 // Draw the current game state
 //
-void PlayerJonsmart::draw()
+void JonFast::draw()
 {
     fl_color(color);
     fl_pie(pos.x - PLAYER_SIZE / 2, pos.y - PLAYER_SIZE / 2, PLAYER_SIZE,
            PLAYER_SIZE, 0, 360);
     fl_color(FL_BLACK);
-    fl_pie(pos.x - 4, pos.y - 4, 2, 3, 0, 360);
-    fl_pie(pos.x + 1, pos.y - 4, 2, 3, 0, 360);
+    fl_pie(pos.x - 4, pos.y - 4, 3, 3, 0, 360);
+    fl_pie(pos.x + 1, pos.y - 4, 3, 3, 0, 360);
     fl_line(pos.x - 2, pos.y + 2, pos.x + 2, pos.y + 2);
 }
 
-#define POS_DIST(p1, p2)                                                       \
-    ((((p1).x > (p2).x) ? ((p1).x - (p2).x) : ((p2).x - (p1).x)) +             \
-     (((p1).y > (p2).y) ? ((p1).y - (p2).y) : ((p2).y - (p1).y)))
+// absolute value: Use in prize acquisition checking
+#define ABSDIFF(x, y)                                                          \
+    (((x) >= (y)) ? (((int)x) - ((int)(y))) : (((int)y) - ((int)(x))))
 
 //
-// Update the game state to a new state
+// Update the player state
 //
-void PlayerJonsmart::update(const GameArea& area,
-                            const std::vector<Prize const*> prizes,
-                            const std::vector<Obstacle const*> obstacles,
-                            const std::vector<PlayerInfo const*> players)
+void JonFast::update(const GameArea& area,
+                           const std::vector<Prize const*> prizes,
+                           const std::vector<Obstacle const*> obstacles,
+                           const std::vector<PlayerInfo const*> players)
 {
-    int dx, dy, curDistance, newDistance;
+    int dx, dy;
     unsigned int i;
     Position target = goal;
     if (haveTarget) {
@@ -95,15 +81,21 @@ void PlayerJonsmart::update(const GameArea& area,
             //return;
         }
     }
-    curDistance = 1000000; // impossibly large number
     for (i = 0; !haveTarget && i < prizes.size(); i++) {
         if (!prizes[i]->claimed) { // && !skipCount) {
-            newDistance = POS_DIST(pos, prizes[i]->pos);
-            if (newDistance < curDistance) {
-                target = prizes[i]->pos;
-                curDistance = newDistance;
-            }
-            //break;
+            target = prizes[i]->pos;
+            break;
+        }
+    }
+    attackMode = false;
+    for (const PlayerInfo* player : players) {
+        if (player->id == id)
+            continue;
+        if (ABSDIFF(pos.x, player->pos.x) < 6 &&
+            ABSDIFF(pos.y, player->pos.y) < 6) {
+            attackMode = true;
+            std::cerr << "setting attack mode!\n";
+            break;
         }
     }
     //if (skipCount) {
@@ -113,20 +105,22 @@ void PlayerJonsmart::update(const GameArea& area,
     //}
     dx = target.x - pos.x;
     dy = target.y - pos.y;
-    if (dx > (MAX_MOVE))
-        dx = (MAX_MOVE);
-    if (dx < -(MAX_MOVE))
-        dx = -(MAX_MOVE);
-    if (dy > (MAX_MOVE))
-        dy = (MAX_MOVE);
-    if (dy < -(MAX_MOVE))
-        dy = -(MAX_MOVE);
+    if (dx > MAX_MOVE)
+        dx = MAX_MOVE;
+    if (dx < -MAX_MOVE)
+        dx = -MAX_MOVE;
+    if (dy > MAX_MOVE)
+        dy = MAX_MOVE;
+    if (dy < -MAX_MOVE)
+        dy = -MAX_MOVE;
     //if (skipCount) dx = 0;
     pos.x += dx;
     pos.y += dy;
 }
 
-void PlayerJonsmart::prizeClaimed(const Prize& prize)
+void JonFast::prizeClaimed(const Prize& prize)
 {
-    cerr << "Hey I claimed of prize of value " << prize.value << endl;
+    std::cerr << "Hey I (" << name() << ") claimed a prize of value " << prize.value << "!\n";
 }
+
+bool JonFast::inAttackMode() { return attackMode; }

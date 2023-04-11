@@ -96,12 +96,12 @@ void GameEngine::newGame()
             for (j = 0; j < i; j++) {
                 if (overlap(obstacles[j]->low, obstacles[j]->high,
                             obstacles[i]->low, obstacles[i]->high)) {
-                    std::cout << "Overlapping obstacles!! regenerate\n";
+                    std::cout << "GameEngine: Overlapping obstacles!! regenerate\n";
                     again = true;
                     break;
                 }
             }
-            std::cout << "Obstacle: " << obstacles[i]->low << obstacles[i]->high
+            std::cout << "GameEngine: Obstacle: " << obstacles[i]->low << obstacles[i]->high
                       << std::endl;
         } while (again);
     }
@@ -129,7 +129,7 @@ void GameEngine::newGame()
             for (j = 0; j < NUM_OBSTACLES && obstacles[j]; j++) {
                 if (overlap(obstacles[j]->low, obstacles[j]->high, pl, ph)) {
                     std::cout
-                          << "Overlapping obstacle/prize!! regenerate prize\n";
+                          << "GameEngine: Overlapping obstacle/prize!! regenerate prize\n";
                     again = true;
                     break;
                 }
@@ -163,10 +163,10 @@ std::vector<std::string> GameEngine::playerNames()
 void GameEngine::setPlayer(int playerNum, int id, std::string name)
 {
     Position start, goal;
-    std::cout << "GE: set player " << playerNum << ": " << id << "-" << name
+    std::cout << "GameEngine: set player " << playerNum << ": " << id << "-" << name
               << std::endl;
     if (playerNum < 0 || playerNum >= MAX_PLAYERS) {
-        std::cerr << "GE Error: bad player num " << playerNum << std::endl;
+        std::cerr << "GameEngine Error: bad player num " << playerNum << std::endl;
         return;
     }
     if (playerNum % 2 == 0) {
@@ -186,7 +186,7 @@ void GameEngine::setPlayer(int playerNum, int id, std::string name)
     players[playerNum] =
           playerFactory->createPlayer(name, playerNum, start, goal);
     if (!players[playerNum]) {
-        std::cerr << "GE Error: player (" << name << ") not found!\n";
+        std::cerr << "GameEngine Error: player (" << name << ") not found!\n";
         return;
     }
     playerStats[playerNum].score = 0;
@@ -227,14 +227,14 @@ void GameEngine::draw()
     // Draw the prizes
     for (i = 0; i < NUM_PRIZES; i++) {
         if (prizes[i]->claimed)
-            fl_color(FL_RED);
+            fl_color(FL_DARK_RED);
         else
-            fl_color(FL_GREEN);
+            fl_color(FL_DARK_GREEN);
         fl_rectf(prizes[i]->pos.x - PRIZE_SIZE / 2,
                  prizes[i]->pos.y - PRIZE_SIZE / 2, PRIZE_SIZE, PRIZE_SIZE);
     }
     // Draw the obstacles
-    fl_color(FL_YELLOW);
+    fl_color(FL_DARK_CYAN);
     for (i = 0; i < NUM_OBSTACLES; i++) {
         fl_rectf(obstacles[i]->low.x, obstacles[i]->low.y,
                  obstacles[i]->high.x - obstacles[i]->low.x + 1,
@@ -275,7 +275,7 @@ void GameEngine::update()
     area.high = lowerRight;
     // iterate through all players
     for (p = 0; p < MAX_PLAYERS; p++) {
-        // if no player at this position, skip
+        // if no player at this position or player is done, skip
         if (!players[p] || playerStats[p].atGoal)
             continue;
         // tell player to update itself, and check for illegal moves
@@ -284,7 +284,7 @@ void GameEngine::update()
         newPos = players[p]->currentPosition();
         if (ABSDIFF(oldPos.x, newPos.x) > (MAX_MOVE) ||
             ABSDIFF(oldPos.y, newPos.y) > (MAX_MOVE)) {
-            std::cerr << "Player " << p
+            std::cerr << "GameEngine: Player " << p
                       << " tries to move to far! Penalty of -1!"
                       << "(" << oldPos << ")"
                       << "(" << newPos << ")\n";
@@ -297,7 +297,7 @@ void GameEngine::update()
                 ABSDIFF(prizes[i]->pos.y, newPos.y) <= 1) {
                 prizes[i]->claimed = true;
                 players[p]->prizeClaimed(*prizes[i]);
-                std::cerr << "Player " << p << " claimed a prize!\n";
+                std::cerr << "GameEngine: Player " << p << " claimed a prize!\n";
                 playerStats[p].score += prizes[i]->value;
             }
         }
@@ -310,14 +310,14 @@ void GameEngine::update()
                 newPos.x < ohigh.x + PLAYER_SIZE / 4 &&
                 newPos.y > olow.y - PLAYER_SIZE / 4 &&
                 newPos.y < ohigh.y + PLAYER_SIZE / 4) {
-                std::cerr << "Player " << p << " hit an obstacle!\n";
+                std::cerr << "GameEngine: Player " << p << " hit an obstacle!\n";
                 playerStats[p].score -= OBSTACLE_HIT_PENALTY;
             }
         }
         // Check to see if player reached their goal (+/- 1 pixel)
         if (ABSDIFF(playerStats[p].goal.x, newPos.x) <= 1 &&
             ABSDIFF(playerStats[p].goal.y, newPos.y) <= 1) {
-            std::cerr << "Player " << p << " reached their goal!\n";
+            std::cerr << "GameEngine: Player " << p << " reached their goal!\n";
             playerStats[p].atGoal = true;
             if (numGoalsReached == 0)
                 playerStats[p].score += FIRST_FINISH_VALUE;
@@ -337,10 +337,10 @@ void GameEngine::update()
     // Check players for intersecting with each other and
     // see if attack mode is on; if it is, award points
     for (unsigned int i1 = 0; i1 < MAX_PLAYERS; i1++) {
-        if (!players[i1])
+        if (!players[i1] || playerStats[i1].atGoal)
             continue;
         for (unsigned int i2 = i1 + 1; i2 < MAX_PLAYERS; i2++) {
-            if (!players[i2])
+            if (!players[i2] || playerStats[i2].atGoal)
                 continue;
             Player& p1 = *players[i1];
             Player& p2 = *players[i2];
@@ -349,15 +349,15 @@ void GameEngine::update()
             if (ABSDIFF(pos1.x, pos2.x) < 3 && ABSDIFF(pos1.y, pos2.y) < 3) {
                 //std::cerr << "Players overlap!\n";
                 if (p1.inAttackMode() && !p2.inAttackMode()) {
-                    std::cerr << p1.name() << " attacks " << p2.name() << "!\n";
+                    std::cerr << "GameEngine: " << p1.name() << " attacks " << p2.name() << "!\n";
                     playerStats[i2].score -= ATTACK_VALUE;
                     playerStats[i1].score += ATTACK_VALUE;
                 } else if (!p1.inAttackMode() && p2.inAttackMode()) {
-                    std::cerr << p2.name() << " attacks " << p1.name() << "!\n";
+                    std::cerr << "GameEngine: " << p2.name() << " attacks " << p1.name() << "!\n";
                     playerStats[i2].score += ATTACK_VALUE;
                     playerStats[i1].score -= ATTACK_VALUE;
                 } else {
-                    std::cerr << p1.name() << " overlaps " << p2.name()
+                    std::cerr << "GameEngine: " << p1.name() << " overlaps " << p2.name()
                               << "!\n";
                 }
             }
