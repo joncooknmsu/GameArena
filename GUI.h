@@ -64,6 +64,7 @@ class MainWindow : public Fl_Double_Window
     MainWindow();
     void initializeNewGame();
     void timerExpired();
+    void showGameStats();
     // user action identifiers
     enum { MENU_EXIT = 1, START_BUTTON, NEWGAME_BUTTON };
     static void dispatcher(Fl_Widget* w, void* selection);

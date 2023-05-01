@@ -22,8 +22,9 @@ MainWindow::MainWindow()
     begin();
     // create menu bar
     menuBar = new MenuBar(*this);
+    //fl_font(FL_HELVETICA_BOLD,30);
     // create drawing area object
-    game = new GameEngine(0, 70, w(), h() - 70);
+    game = new GameEngine(0, 90, w(), h() - 90);
     // declare the drawing area to be resizable
     resizable(game);
     // create start/stop button
@@ -104,6 +105,11 @@ void MainWindow::timerExpired()
     }
 }
 
+void MainWindow::showGameStats()
+{
+   game->showGameStats();
+}
+
 void MainWindow::initializeNewGame()
 {
     game->newGame();
@@ -140,19 +146,21 @@ void PlayerSelector::select(int selection)
 }
 
 PlayerSelector::PlayerSelector(int pi, MainWindow& app)
-      : Fl_Menu_Button(170 + pi * 80, 35, 75, 25, "NoPlayer"), app(app)
+      : Fl_Menu_Button(250 + pi * 190, 35, 185, 45, "NoPlayer"), app(app)
 {
     playerNumber = pi;
+    this->labelsize(22);
 }
 
 //------------- StartButton -------------------//
 
 StartButton::StartButton(MainWindow& app)
-      : Fl_Button(5, 35, 60, 25, "Start"), app(app)
+      : Fl_Button(5, 35, 80, 45, "Start"), app(app)
 {
     // connect this button up to the dispatcher, which will
     // invoke "pushed()" on the button when it is pushed
     callback(MainWindow::dispatcher, (void*)MainWindow::START_BUTTON);
+    this->labelsize(22);
 }
 
 void StartButton::pushed()
@@ -173,6 +181,7 @@ void StartButton::pushed()
         Fl::remove_timeout(::timerExpired, &app);
         started = false;
         label("Start");
+        app.showGameStats();
         //win->newGameButton->show();
         //for (i = 0; i < 4; i++)
         //    win->playerSelector[i]->show();
@@ -182,11 +191,12 @@ void StartButton::pushed()
 //------------- NewGameButton -------------------//
 
 NewGameButton::NewGameButton(MainWindow& app)
-      : Fl_Button(75, 35, 80, 25, "New Game"), app(app)
+      : Fl_Button(95, 35, 130, 45, "New Game"), app(app)
 {
     // connect this button up to the dispatcher, which will
     // invoke "pushed()" on the button when it is pushed
     callback(MainWindow::dispatcher, (void*)MainWindow::NEWGAME_BUTTON);
+    this->labelsize(22);
 }
 
 void NewGameButton::pushed()
@@ -197,7 +207,7 @@ void NewGameButton::pushed()
 
 //------------- MenuBar -------------------//
 
-MenuBar::MenuBar(MainWindow& app) : Fl_Menu_Bar(0, 0, 500, 30), app(app)
+MenuBar::MenuBar(MainWindow& app) : Fl_Menu_Bar(0, 0, 800, 30), app(app)
 {
     // Add File->Quit menu item and connect it to the dispatcher
     add("&File/&Quit", "^q", MainWindow::dispatcher,

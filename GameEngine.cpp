@@ -81,12 +81,12 @@ void GameEngine::newGame()
                   (random() %
                    (lowerRight.x - upperLeft.x -
                     (MAX_OBSTACLE_WIDTH + MIN_OBSTACLE_WIDTH + PLAYER_SIZE))) +
-                  upperLeft.x + MIN_OBSTACLE_WIDTH;
+                  upperLeft.x + MIN_OBSTACLE_WIDTH + PLAYER_SIZE;
             obstacles[i]->low.y =
                   (random() % (lowerRight.y - upperLeft.y -
                                (MAX_OBSTACLE_HEIGHT + MIN_OBSTACLE_HEIGHT +
                                 PLAYER_SIZE))) +
-                  upperLeft.y + MIN_OBSTACLE_HEIGHT;
+                  upperLeft.y + MIN_OBSTACLE_HEIGHT + PLAYER_SIZE;
             obstacles[i]->high.x =
                   obstacles[i]->low.x +
                   (random() % MAX_OBSTACLE_WIDTH + MIN_OBSTACLE_WIDTH);
@@ -285,10 +285,10 @@ void GameEngine::update()
         if (ABSDIFF(oldPos.x, newPos.x) > (MAX_MOVE) ||
             ABSDIFF(oldPos.y, newPos.y) > (MAX_MOVE)) {
             std::cerr << "GameEngine: Player " << p
-                      << " tries to move to far! Penalty of -1!"
+                      << " tries to move to far!"
                       << "(" << oldPos << ")"
                       << "(" << newPos << ")\n";
-            playerStats[p].score--;
+            playerStats[p].score -= TOO_FAST_PENALTY;
         }
         // now check to see if player landed on any prizes (+/- 1 pixel)
         for (i = 0; i < NUM_PRIZES; i++) {
@@ -306,13 +306,19 @@ void GameEngine::update()
             Position olow = obstacles[i]->low;
             Position ohigh = obstacles[i]->high;
             // technically PLAYER_SIZE/2 should be the border, but let's be generous
-            if (newPos.x > olow.x - PLAYER_SIZE / 4 &&
-                newPos.x < ohigh.x + PLAYER_SIZE / 4 &&
-                newPos.y > olow.y - PLAYER_SIZE / 4 &&
-                newPos.y < ohigh.y + PLAYER_SIZE / 4) {
+            if (newPos.x > olow.x - PLAYER_SIZE / 6 &&
+                newPos.x < ohigh.x + PLAYER_SIZE / 6 &&
+                newPos.y > olow.y - PLAYER_SIZE / 6 &&
+                newPos.y < ohigh.y + PLAYER_SIZE / 6) {
                 std::cerr << "GameEngine: Player " << p << " hit an obstacle!\n";
                 playerStats[p].score -= OBSTACLE_HIT_PENALTY;
             }
+        }
+        // Check if player is out of bounds
+        if (newPos.x < upperLeft.x || newPos.x > lowerRight.x ||
+            newPos.y < upperLeft.y || newPos.y > lowerRight.y) { 
+            std::cerr << "GameEngine: Player " << p << " is out of bounds!\n";
+            playerStats[p].score -= OUT_OF_BOUNDS_PENALTY;
         }
         // Check to see if player reached their goal (+/- 1 pixel)
         if (ABSDIFF(playerStats[p].goal.x, newPos.x) <= 1 &&
@@ -346,7 +352,8 @@ void GameEngine::update()
             Player& p2 = *players[i2];
             Position pos1 = p1.currentPosition();
             Position pos2 = p2.currentPosition();
-            if (ABSDIFF(pos1.x, pos2.x) < 3 && ABSDIFF(pos1.y, pos2.y) < 3) {
+            if (ABSDIFF(pos1.x, pos2.x) < ATTACK_OVERLAP && 
+                ABSDIFF(pos1.y, pos2.y) < ATTACK_OVERLAP) {
                 //std::cerr << "Players overlap!\n";
                 if (p1.inAttackMode() && !p2.inAttackMode()) {
                     std::cerr << "GameEngine: " << p1.name() << " attacks " << p2.name() << "!\n";
