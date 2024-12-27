@@ -1,0 +1,61 @@
+from: https://groups.google.com/g/fltkgeneral/c/7OzPQqMbans?pli=1
+
+There are three or in the latest versions even four (five) different
+levels of event handling you can use. In the order of complexity (lowest
+first):
+
+(1) callbacks are used for "simple" things that are prepared by the
+widget for the user to use easily. Fl_Button widgets fire their
+callbacks when the button was clicked, Fl_Input widgets when their
+value() was changed (FL_WHEN_CHANGED) and the widget was left (lost
+focus: FL_WHEN_RELEASE) and so on. The details should be given in the
+widget's documentation. For the usual tasks using the given callbacks
+should be sufficient.
+
+(2) If you need more detailed handling of events, for instance
+distinguishing double clicks from single clicks, left mouse from right
+mouse clicks [1] and so on, or if you want to handle FL_ENTER and
+FL_LEAVE events for button highlighting or anything else, then you need
+to derive your own class usually from an existing widget and write your
+own handle() method for your class. This is described in the chapter
+"Adding and Extending Widgets". It's more complex and more work since
+you need to take care of all the details of events delivered to the widget.
+https://www.fltk.org/doc-1.3/subclassing.html
+
+[1] If this is all you want you can also use Fl::event_*() methods in
+the callback, but that's somewhat limited.
+
+(3) You will likely not want to use Fl::add_handler() which is the next
+higher level of complexity. See the documentation:
+https://www.fltk.org/doc-1.3/group__fl__events.html#gae2d39bda7362e444afa41166c478b904
+
+You will only need to use this if you want to handle events that FLTK
+doesn't recognize or that none of your widgets handles by returning 1
+from its handle() method. This is rarely used. The handler will be
+called *after* FLTK tried to handle the event.
+
+(4) Fl::add_system_handler() is even lower level and more complex. You
+will get all system events *before* FLTK handles them and you can decide
+whether to use them, dismiss them, or let FLTK handle them. This can be
+useful if you want to delegate several events to another toolkit for a
+particular window but should usually not be necessary for standard
+applications.
+
+(5) Fl::event_dispatch() is handled somewhat between (4) and and the
+normal FLTK event handling. Your own dispatch function will be called
+for every system event but after FLTK converted it to a FLTK event
+structure, hence it's higher level than (4) because you don't have to
+deal with platform specific event structures, but it's also more
+complicated since you have to call FLTK's event handling function
+yourself as opposed to just returning 1 or 0. As for (4) you will rarely
+want to use this, it's for special purposes only.
+https://www.fltk.org/doc-1.3/group__fl__events.html#gafc8bd62d8fdacef87c56ed3a22cdcebc
+
+
+Callbacks (1) should be documented well enough, examples for (2)
+Fl_Widget::handle() or Derived_Class::handle() can be seen in the FLTK
+code and documentation [2], but examples for (3) and (4) are hard to
+find and only for very special cases.
+
+[2] https://www.fltk.org/doc-1.3/subclassing.html#subclassing_events
+
